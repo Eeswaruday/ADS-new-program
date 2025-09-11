@@ -1,0 +1,77 @@
+#include <iostream>
+
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+// Pre-order traversal: Root -> Left -> Right
+void preOrderTraversal(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    cout << root->val << " ";
+    preOrderTraversal(root->left);
+    preOrderTraversal(root->right);
+}
+
+// In-order traversal: Left -> Root -> Right
+void inOrderTraversal(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    inOrderTraversal(root->left);
+    cout << root->val << " ";
+    inOrderTraversal(root->right);
+}
+
+// Post-order traversal: Left -> Right -> Root
+void postOrderTraversal(TreeNode* root) {
+    if (root == nullptr) {
+        return;
+    }
+    postOrderTraversal(root->left);
+    postOrderTraversal(root->right);
+    cout << root->val << " ";
+}
+
+// Helper function to create a binary tree
+TreeNode* createSampleTree() {
+    // Create nodes
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+    root->right->left = new TreeNode(6);
+    root->right->right = new TreeNode(7);
+    return root;
+}
+
+// Main function
+int main() {
+    TreeNode* root = createSampleTree();
+
+    cout << "Pre-order Traversal: ";
+    preOrderTraversal(root);
+    cout << endl;
+
+    cout << "In-order Traversal: ";
+    inOrderTraversal(root);
+    cout << endl;
+
+    cout << "Post-order Traversal: ";
+    postOrderTraversal(root);
+    cout << endl;
+
+    // Cleanup
+    // In a real-world application, you would need to free the allocated memory.
+    // This is left as an exercise for you.
+
+    return 0;
+}
