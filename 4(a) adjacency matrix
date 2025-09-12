@@ -1,0 +1,81 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <vector>
+
+using namespace std;
+
+// Function to perform Breadth-First Traversal (BFT)
+void BFT(vector<vector<int>>& adjMatrix, int startVertex) {
+    int numVertices = adjMatrix.size();
+    vector<bool> visited(numVertices, false);
+    queue<int> q;
+
+    visited[startVertex] = true;
+    q.push(startVertex);
+
+    cout << "Breadth-First Traversal starting from vertex " << startVertex << ": ";
+
+    while (!q.empty()) {
+        int currentVertex = q.front();
+        q.pop();
+        cout << currentVertex << " ";
+
+        // Traverse the adjacency matrix for the current vertex
+        for (int i = 0; i < numVertices; i++) {
+            if (adjMatrix[currentVertex][i] == 1 && !visited[i]) {
+                visited[i] = true;
+                q.push(i);
+            }
+        }
+    }
+    cout << endl;
+}
+
+// Function to perform Depth-First Traversal (DFT)
+void DFTUtil(vector<vector<int>>& adjMatrix, int vertex, vector<bool>& visited) {
+    visited[vertex] = true;
+    cout << vertex << " ";
+
+    int numVertices = adjMatrix.size();
+
+    // Traverse the adjacency matrix for the current vertex
+    for (int i = 0; i < numVertices; i++) {
+        if (adjMatrix[vertex][i] == 1 && !visited[i]) {
+            DFTUtil(adjMatrix, i, visited);
+        }
+    }
+}
+
+void DFT(vector<vector<int>>& adjMatrix, int startVertex) {
+    int numVertices = adjMatrix.size();
+    vector<bool> visited(numVertices, false);
+
+    cout << "Depth-First Traversal starting from vertex " << startVertex << ": ";
+    DFTUtil(adjMatrix, startVertex, visited);
+    cout << endl;
+}
+
+int main() {
+    int numVertices, startVertex;
+
+    cout << "Enter the number of vertices in the graph: ";
+    cin >> numVertices;
+
+    vector<vector<int>> adjMatrix(numVertices, vector<int>(numVertices, 0));
+
+    cout << "Enter the adjacency matrix of the graph:\n";
+    for (int i = 0; i < numVertices; i++) {
+        for (int j = 0; j < numVertices; j++) {
+            cin >> adjMatrix[i][j];
+        }
+    }
+
+    cout << "Enter the starting vertex: ";
+    cin >> startVertex;
+
+    BFT(adjMatrix, startVertex);
+    DFT(adjMatrix, startVertex);
+
+    return 0;
+}
