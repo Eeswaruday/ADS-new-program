@@ -1,0 +1,134 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <limits>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+// Structure to represent a point in 2D space
+struct Point {
+    double x, y;
+};
+
+// Function to generate random points in a unit square [0,1] x [0,1]
+vector<Point> generateRandomPoints(int n) {
+    vector<Point> points(n);
+    srand(time(0)); // Seed for randomness
+
+    for (int i = 0; i < n; i++) {
+        points[i].x = (double)rand() / RAND_MAX;  // Random x between 0 and 1
+        points[i].y = (double)rand() / RAND_MAX;  // Random y between 0 and 1
+    }
+
+    return points;
+}
+
+// Function to calculate the Euclidean distance between two points
+double dist(const Point& p1, const Point& p2) {
+    return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+}
+
+// A utility function to compare points based on x-coordinate
+bool compareX(const Point& p1, const Point& p2) {
+    return p1.x < p2.x;
+}
+
+// A utility function to compare points based on y-coordinate
+bool compareY(const Point& p1, const Point& p2) {
+    return p1.y < p2.y;
+}
+
+// Brute force method to find the closest distance between points for small arrays
+double bruteForce(vector<Point>& points, int left, int right) {
+    double minDist = numeric_limits<double>::infinity();
+    for (int i = left; i < right; ++i) {
+        for (int j = i + 1; j <= right; ++j) {
+            double d = dist(points[i], points[j]);
+            if (d < minDist) {
+                minDist = d;
+            }
+        }
+    }
+    return minDist;
+}
+
+// Function to find the closest distance in the strip of points around the middle line
+double stripClosest(vector<Point>& strip, double d) {
+    double minDist = d;
+    
+    // Sort the points in the strip by their y-coordinates
+    sort(strip.begin(), strip.end(), compareY);
+    
+    // Compare each point with the next 7 points to find the closest pair in the strip
+    for (size_t i = 0; i < strip.size(); ++i) {
+        for (size_t j = i + 1; j < strip.size() && (strip[j].y - strip[i].y) < minDist; ++j) {
+            double d = dist(strip[i], strip[j]);
+            if (d < minDist) {
+                minDist = d;
+            }
+        }
+    }
+    
+    return minDist;
+}
+
+// Recursive function to find the closest pair of points
+double closestUtil(vector<Point>& points, int left, int right) {
+    // If there are 3 or fewer points, use the brute force method
+    if (right - left <= 3) {
+        return bruteForce(points, left, right);
+    }
+
+    // Find the middle point
+    int mid = left + (right - left) / 2;
+    Point midPoint = points[mid];
+
+    // Recursively find the smallest distance in the left and right halves
+    double dLeft = closestUtil(points, left, mid);
+    double dRight = closestUtil(points, mid + 1, right);
+    
+    // Find the smaller of the two distances
+    double d = min(dLeft, dRight);
+
+    // Create a strip of points that are closer to the midPoint.x than d
+    vector<Point> strip;
+    for (int i = left; i <= right; i++) {
+        if (abs(points[i].x - midPoint.x) < d) {
+            strip.push_back(points[i]);
+        }
+    }
+
+    // Find the closest distance in the strip
+    return min(d, stripClosest(strip, d));
+}
+
+// Main function to find the closest pair of points using divide and conquer
+double closestPair(vector<Point>& points) {
+    // Sort the points by x-coordinates before starting the divide and conquer process
+    sort(points.begin(), points.end(), compareX);
+    return closestUtil(points, 0, points.size() - 1);
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of points: ";
+    cin >> n;
+
+    // Generate random points in a unit square
+    vector<Point> points = generateRandomPoints(n);
+
+    // Display the generated points
+    cout << "Generated Points:\n";
+    for (const auto& point : points) {
+        cout << "(" << point.x << ", " << point.y << ")\n";
+    }
+
+    // Find and print the closest pair distance
+    double minDist = closestPair(points);
+    cout << "The smallest distance is: " << minDist << endl;
+
+    return 0;
+}
