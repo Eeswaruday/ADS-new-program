@@ -1,0 +1,118 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <chrono>
+
+using namespace std;
+using namespace std::chrono;
+
+// Function to perform quicksort
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+    
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// Function to merge two halves for merge sort
+void merge(vector<int>& arr, int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+    vector<int> L(n1), R(n2);
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (int i = 0; i < n2; i++)
+        R[i] = arr[m + 1 + i];
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+// Function to perform merge sort
+void mergeSort(vector<int>& arr, int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}
+
+// Function to generate a vector of random integers
+vector<int> generateRandomVector(int size) {
+    vector<int> arr(size);
+    for (int i = 0; i < size; i++) {
+        arr[i] = rand() % 10000; // Random integers between 0 and 9999
+    }
+    return arr;
+}
+
+// Function to measure and print execution time
+void measureExecutionTime(void (*sortFunction)(vector<int>&, int, int), vector<int> arr, string sortName) {
+    auto start = high_resolution_clock::now();
+    sortFunction(arr, 0, arr.size() - 1);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << sortName << " took " << duration.count() << " microseconds" << endl;
+}
+
+int main() {
+    // Vector sizes for testing
+    vector<int> sizes = {1000, 5000, 10000, 50000, 100000};
+
+    for (int size : sizes) {
+        vector<int> arr = generateRandomVector(size);
+        cout << "\nArray Size: " << size << endl;
+        
+        // Measure Quick Sort
+        vector<int> quickSortArr = arr;
+        measureExecutionTime(quickSort, quickSortArr, "Quick Sort");
+
+        // Measure Merge Sort
+        vector<int> mergeSortArr = arr;
+        auto start = high_resolution_clock::now();
+        mergeSort(mergeSortArr, 0, mergeSortArr.size() - 1);
+        auto stop = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>(stop - start);
+        cout << "Merge Sort took " << duration.count() << " microseconds" << endl;
+    }
+
+    return 0;
+}
